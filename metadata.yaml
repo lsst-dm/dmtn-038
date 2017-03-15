@@ -17,7 +17,7 @@ doc_title: 'Measurement of Blended Objects in LSST'
 
 # Author names, ordered as a list. Each author name should be formatted as 'First Last'
 authors:
-    - 'Tim Jenness'
+    - 'Jim Bosch'
 
 # Current document revision date, YYYY-MM-DD
 # Only set this field if you need to manually fix the revision date;
@@ -34,7 +34,7 @@ authors:
 # doi: 10.5281/zenodo.#####
 
 # Copyright statement
-copyright: '2017, AURA/LSST'
+copyright: '2017, Princeton University'
 
 # Description. A short, 1-2 sentence statemement used by document indices.
 description: 'Most LSST objects will overlap one or more of its neighbors enough to affect naive measurements of their properties.  One of the major challenges in the deep processing pipeline will be measuring these sources in a way that corrects for and/or characterizes the effect of these blends.'

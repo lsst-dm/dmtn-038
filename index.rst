@@ -38,6 +38,7 @@
    Feel free to delete this instructional comment.
 
 :tocdepth: 1
+
 .. Please do not modify tocdepth; will be fixed when a new Sphinx theme is shipped.
 
 .. sectnum::
@@ -135,6 +136,8 @@ overdeblending (we’d like to evaluate all alternate hypotheses for any
 combination of peaks belonging to the same object, but that’s
 infeasible).
 
+.. _deblender:
+
 Deblended Measurement
 =====================
 
@@ -150,12 +153,13 @@ variances), solving for coefficients :math:`\alpha_{j}`:
 .. math::
 
    \begin{aligned}
-   \bm{\alpha} = \left(\bm{T}^T\bm{T}\right)^{-1}\!\bm{T}^T\bm{I}\end{aligned}
+   \mathbf{\alpha} = \left(\mathbf{T}^T\mathbf{T}\right)^{-1}\!\mathbf{T}^T\mathbf{I}
+   \end{aligned}
 
- Our best-fit prediction for the pixel value vector is thus
-:math:`\bm{T}\bm{\alpha}`. Because this is not the same as the true
-pixel vector :math:`\bm{I}`, we do not use the per-object model
-prediction :math:`\bm{T}\bm{\alpha}` directly for the deblended pixel
+Our best-fit prediction for the pixel value vector is thus
+:math:`\mathbf{T}\mathbf{\alpha}`. Because this is not the same as the true
+pixel vector :math:`\mathbf{I}`, we do not use the per-object model
+prediction :math:`\mathbf{T}\mathbf{\alpha}` directly for the deblended pixel
 values; instead we reapportion the true per-pixel fluxes according to
 the relative predicted contribution from each object:
 
@@ -191,22 +195,22 @@ following procedure:
 
 #. For each blend family:
 
-   #. For each child object in the current blend family:
+   a. For each child object in the current blend family:
 
-      #. Insert the child’s ``HeavyFootprint`` into the image, replacing
+      i. Insert the child’s ``HeavyFootprint`` into the image, replacing
          (not adding to) any pixels it covers.
 
-      #. Run all measurement algorithms to produce *child* measurements.
+      i. Run all measurement algorithms to produce *child* measurements.
 
-      #. Replace the pixels in the child’s ``Footprint`` region with
+      i. Replace the pixels in the child’s ``Footprint`` region with
          (the same) random noise again.
 
-   #. Revert the pixels in the parent ``Footprint`` to their original
+   b. Revert the pixels in the parent ``Footprint`` to their original
       values.
 
-   #. Run all measurement algorithms to produce *parent* measurements.
+   c. Run all measurement algorithms to produce *parent* measurements.
 
-   #. Replace the parent ``Footprint`` pixels with (the same) random
+   d. Replace the parent ``Footprint`` pixels with (the same) random
       noise again.
 
 This procedure double-counts flux that is not part of a ``Footprint``,
@@ -214,8 +218,15 @@ but this is considered better than ignoring this flux, because most
 measurement algorithms utilize some other procedure for downweighting
 the contribution of faraway pixels.
 
+.. [1]
+   In *Photo*, this template was determined from symmetry arguments and
+   a number of heuristics; a full description of how we plan to generate
+   templates in LSST is beyond the scope of this paper.
+
 Simultaneous Fitting
 ====================
+
+.. _model-selection:
 
 Model Selection
 ---------------
@@ -279,7 +290,7 @@ total number of outputs is :math:`O(N^2)` in the number of objects. The
 matrix should be sparse for sufficiently large blends, however, so a
 storage scheme that takes advantage of this would address the problem.
 
-If we elect to use hybrid models described in [sec:model-selection], we
+If we elect to use hybrid models described in :ref:`model-selection`, we
 will almost certainly have to develop our own optimization code rather
 than adopt an existing third-party code. High-quality optimization
 libraries that can handle complex parameter constraints are extremely
@@ -288,6 +299,8 @@ have to develop our own optimizer even for single-object,
 non-simultaneous fitting, however, as even the simpler constraints
 involved in a single-object galaxy models are sufficiently complex to
 give most free optimizers trouble.
+
+.. _sampling:
 
 Monte Carlo Sampling
 --------------------
@@ -353,7 +366,7 @@ a binned image of a larger sky area, and use this to generate templates
 for the largest objects. We then move to subimages at high resolution
 resolution to produce templates for smaller object, until we return to
 the regular pixel scale. The final linear fit for template coeffients
-(:math:`\bm{\alpha}`) could then be done on a combination of regular
+(:math:`\mathbf{\alpha}`) could then be done on a combination of regular
 pixels and binned superpixels, depending on which templates are active
 in a particular region, and may make use of sparse matrix methods. This
 approach may need to be iterative.
@@ -370,12 +383,14 @@ unnecessary to do any kind of divide-and-conquer for simultaneous
 fitting if we use sparse matrix methods and parallelize in a way that
 splits likelihood evaluation over multiple cores.
 
+.. _models-as-templates:
+
 Models as Deblend Templates
 ===========================
 
 Thus far we’ve considered simultaneous fitting as an optional stage
 following per-pixel deblending. We can also use the results of a
-simultaneous fit as the weighted templates (:math:`\bm{T}\bm{\alpha}`)
+simultaneous fit as the weighted templates (:math:`\mathbf{T}\mathbf{\alpha}`)
 in a subsequent deblending step.
 
 We’ve already highlighted model flexibility as an advantage of deblended
@@ -404,6 +419,8 @@ some advantages over more flexible templates:
    repeat the suite of moments-based measurements on deblended pixels
    derived from model parameters at each sample point in a Monte Carlo
    simultaneous fit.
+
+.. _time-domain:
 
 Variability, Transients, and Solar System Objects
 =================================================
@@ -460,21 +477,18 @@ LSST Pipeline Straw-Man Proposal
 The above sections describe a number of algorithmic options that can be
 combined in myriad ways. In this section, we describe (at summary level)
 a full baseline pipeline and a few top-priority alternatives. The
-baseline plan is outlined in Figure [fig:flowchart], with details
-described in the next section and alternatives in
-Section [sec:alternatives].
+baseline plan is outlined in Figure :ref:`fig-flowchart`, with details
+described in the :ref:`next section <baseline>` and alternatives in
+Section :ref:`alternatives`.
 
-.. figure:: /_static/flowchart.svg
-   :alt: Baseline Pipeline for Blended Measurement
-
-   Baseline Pipeline for Blended Measurement
+.. _baseline:
 
 Baseline
 --------
 
 The first major processing stage described here is the Deblender [P1],
 which we imagine as an algorithm very similar to that the SDSS *Photo*
-deblender described in Section [sec:deblender], likely using a symmetry
+deblender described in Section :ref:`deblender`, likely using a symmetry
 ansatz to define templates. The inputs will be a detection catalog
 containing merged ``F``\ ootprints and ``P``\ eaks from all detection
 images [D1], and at least one coadd image per filter [D2]. We may have
@@ -485,7 +499,14 @@ these inputs and the parallelization and data flow within the deblender
 itself are beyond the scope of this document. The outputs are deblended
 pixel values for both direct [D4] and PSF- matched [D5] coadds
 (generated by sequentially replacing neighbors with noise, as described
-in Section [sec:deblender]).
+in Section :ref:`deblender`).
+
+.. figure:: /_static/flowchart.svg
+   :name: fig-flowchart
+   :target: ./_static/flowchart.svg
+   :alt: Baseline Pipeline for Blended Measurement
+
+   Baseline Pipeline for Blended Measurement
 
 These deblended coadds are used for three different groups of
 measurement algorithms, which we split here into separate processing
@@ -513,7 +534,7 @@ together):
    additionally fitting a moving and/or variable point source model at
    this stage. We’ll do at least one fit that uses the same structural
    (non-amplitude) parameters in all filters, to allow the model fluxes
-   to be useful as for galaxy colors (see [sec:consistent-galaxy-colors]
+   to be useful as for galaxy colors (see :ref:`consistent-galaxy-colors`
    for an alternative). We may also perform completely independent model
    fitting each each filter.
 
@@ -535,12 +556,12 @@ to a multi-epoch sampling step [P7], and are essentially just a
 performance optimization.
 
 In multi-epoch mode, we use hybrid models (as described in
-Section [sec:model-selection]) and consider all objects in a blend
+Section :ref:`model-selection`) and consider all objects in a blend
 simultaneously, first fitting with an optimizer [P6] and then Monte
 Carlo sampling [P7]. In both cases we will fit to multiple filters
 simultenously (though perhaps not all filters), and only allow the flux
 to vary between filters (i.e. the models will not support variability –
-but see also [sec:variable-models] for an alternative). As in the coadd
+but see also :ref:`variable-models` for an alternative). As in the coadd
 fitting, the structural parameters of the galaxy models will be required
 to be the same in each filter. As discussed in §5.2.2 of the
 `DPDD <https://docushare.lsstcorp.org/docushare/dsweb/Get/LSE-163>`__,
@@ -553,10 +574,10 @@ measurements for fainter stars, and may yield better galaxy photometry
 and morphology measurements than the deblended coadd fitting.
 
 The simultaneous optimizer-based fit will also be used as templates for
-another round of deblending (as in Section [sec:models-as-templates]),
+another round of deblending (as in Section :ref:`models-as-templates`),
 this time producing deblended pixel values for individual visits [D7].
 These will be used for forced PSF photometry (
-`DPDD <https://docushare.lsstcorp.org/docushare/dsweb/Get/LSE-163>`__§5.2.4)
+`DPDD <https://docushare.lsstcorp.org/docushare/dsweb/Get/LSE-163>`__ §5.2.4)
 at the per-epoch positions determined from the simultaneous multi-epoch
 fit. This will populate the forced source catalog [D9], which represent
 our best estimates of the lightcurves of faint variable objects. We use
@@ -566,12 +587,16 @@ vast majority of variable objects are indeed point sources.
 
 For all multi-epoch measurements, we include models for transient and
 fast- moving objects detected in difference images [D10], as described
-in Section [sec:time-domain]. These models will have a free flux
+in Section :ref:`time-domain`. These models will have a free flux
 parameter in each epoch, but will have centroids fixed at the position
 determined from detection image(s).
 
+.. _alternatives:
+
 Possible Modifications
 ----------------------
+
+.. _likelihood-coadds:
 
 Likelihood Coadds
 ~~~~~~~~~~~~~~~~~
@@ -592,6 +617,8 @@ Evaluation of likelihood coadds will begin simply with analytical
 calculations and a small-scale prototype that operates only on postage
 stamp images. An evaluation of whether a full-scale optimized
 implemention is useful will be determined later.
+
+.. _models-on-psf-matched-coadds:
 
 Model Fluxes on PSF-Matched Coadds
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -615,6 +642,8 @@ opportunity to evaluate both options in this area extensively before
 selecting one for final tuning. The development of fast metrics to
 evaluate the quality of galaxy color measurements will be critically
 important.
+
+.. _consistent-galaxy-colors:
 
 Consistent Cross-Filter Galaxy Structural Parameters
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -647,6 +676,8 @@ Evaluating the options here is largely a matter of ensuring the
 galaxy-fitting code is sufficiently flexible that slightly different
 models and priors can be tested easily. Again, we will need good metrics
 for quantifying the quality of galaxy color measurements.
+
+.. _variable-models:
 
 Variability in Multi-Epoch Modeling
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -713,6 +744,8 @@ processing, as any science involving strongly lensed quasars or AGN in
 galaxy clusters will require modeling complex blends of variable point
 sources and galaxies.
 
+.. _diffim-forced-phot:
+
 Forced Photometry on Difference Images
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -731,6 +764,8 @@ the template image.
 This approach probably has the highest ceiling of any method for
 measuring variable blended sources, but it is untested and the
 mathematical formalism has yet to be developed.
+
+.. _deblender-translation:
 
 Deblend Template Translation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -771,8 +806,3 @@ baseline, simply because the translated deblend templates will have more
 flexibility than the analytic models used in fitting. On the other hand,
 translated deblend templates will be limited by the quality of the coadd
 and their inability to account for proper motions.
-
-.. [1]
-   In * Photo*, this template was determined from symmetry arguments and
-   a number of heuristics; a full description of how we plan to generate
-   templates in LSST is beyond the scope of this paper.

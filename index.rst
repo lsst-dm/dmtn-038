@@ -59,7 +59,7 @@ The measurements of interest are those in §5.2 of the
 These can be split up broadly into two categories:
 
 -  weighted moments (includes *adaptive moments*, *Kron and Petrosian
-   fluxes*, and *aperture surface brightness*;
+   fluxes*, and *aperture surface brightness*);
 
 -  forward modeling (includes *point source model fit* and *bulge-disk
    model fit*).

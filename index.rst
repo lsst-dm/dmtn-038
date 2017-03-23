@@ -55,7 +55,7 @@ sources in a way that corrects for and/or characterizes the effect of
 these blends.
 
 The measurements of interest are those in §5.2 of the
-`DPDD`_.
+`DPDD`_ :cite:`LSE-163`.
 These can be split up broadly into two categories:
 
 -  weighted moments (includes *adaptive moments*, *Kron and Petrosian
@@ -142,7 +142,7 @@ Deblended Measurement
 =====================
 
 The specific approach to deblending we plan to take for LSST is based on
-the deblender in the SDSS *Photo* pipeline.
+the deblender in the SDSS *Photo* pipeline. :cite:`RHL-deblender`
 
 Given pixel values :math:`I_{i}`, we create a “template” :math:`T_{i,j}`
 that represents an attempt to model the surface brightness of object
@@ -233,7 +233,7 @@ Model Selection
 
 The LSST pipeline will fit both a moving point source and a galaxy model
 to each object (see §5.2.1 of the
-`DPDD`_).
+`DPDD`_ :cite:`LSE-163`).
 With simultaneous fitting, however, we also have to consider which
 models to use for neighbors, and it is clear that allowing for every
 possible combination is infeasible (we’d need to fit each blend
@@ -564,7 +564,7 @@ to vary between filters (i.e. the models will not support variability –
 but see also :ref:`variable-models` for an alternative). As in the coadd
 fitting, the structural parameters of the galaxy models will be required
 to be the same in each filter. As discussed in §5.2.2 of the
-`DPDD`_,
+`DPDD`_ :cite:`LSE-163`,
 the most important use case for the Monte Carlo samples [D8] is shear
 estimation for gravitational lensing, but we anticipate it being useful
 for any study of faint objects for which unbiased population statistics
@@ -577,7 +577,7 @@ The simultaneous optimizer-based fit will also be used as templates for
 another round of deblending (as in Section :ref:`models-as-templates`),
 this time producing deblended pixel values for individual visits [D7].
 These will be used for forced PSF photometry (
-`DPDD`_ §5.2.4)
+`DPDD`_ §5.2.4 :cite:`LSE-163`)
 at the per-epoch positions determined from the simultaneous multi-epoch
 fit. This will populate the forced source catalog [D9], which represent
 our best estimates of the lightcurves of faint variable objects. We use
@@ -808,3 +808,7 @@ translated deblend templates will be limited by the quality of the coadd
 and their inability to account for proper motions.
 
 .. _DPDD: https://ls.st/LSE-163
+
+.. bibliography:: lsst.bib
+   :encoding: latex+latin
+   :style: plain
